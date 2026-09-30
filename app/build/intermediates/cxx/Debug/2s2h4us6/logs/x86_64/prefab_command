@@ -1,0 +1,19 @@
+/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin/java \
+  --class-path \
+  /Users/ashutoshsamal/.gradle/caches/modules-2/files-2.1/com.google.prefab/cli/2.1.0/aa32fec809c44fa531f01dcfb739b5b3304d3050/cli-2.1.0-all.jar \
+  com.google.prefab.cli.AppKt \
+  --build-system \
+  cmake \
+  --platform \
+  android \
+  --abi \
+  x86_64 \
+  --os-version \
+  28 \
+  --stl \
+  c++_shared \
+  --ndk-version \
+  30 \
+  --output \
+  /var/folders/h9/r0rp1z694gg_hbnv_v7gn7340000gn/T/agp-prefab-staging9214555035488324231/staged-cli-output \
+  /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/e6663c2903d3ca874756baf547d08338/transformed/oboe-1.9.0/prefab

@@ -1,0 +1,184 @@
+[
+  {
+    "level_": 0,
+    "message_": "Start JSON generation. Platform version: 28 min SDK version: x86_64",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "rebuilding JSON /Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/x86_64/android_gradle_build.json due to:",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "- no fingerprint file, will remove stale configuration folder",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin/java \\\n  --class-path \\\n  /Users/ashutoshsamal/.gradle/caches/modules-2/files-2.1/com.google.prefab/cli/2.1.0/aa32fec809c44fa531f01dcfb739b5b3304d3050/cli-2.1.0-all.jar \\\n  com.google.prefab.cli.AppKt \\\n  --build-system \\\n  cmake \\\n  --platform \\\n  android \\\n  --abi \\\n  x86_64 \\\n  --os-version \\\n  28 \\\n  --stl \\\n  c++_shared \\\n  --ndk-version \\\n  30 \\\n  --output \\\n  /var/folders/h9/r0rp1z694gg_hbnv_v7gn7340000gn/T/agp-prefab-staging9214555035488324231/staged-cli-output \\\n  /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/e6663c2903d3ca874756baf547d08338/transformed/oboe-1.9.0/prefab\n",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "Received process result: 0",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "removing stale contents from \u0027/Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/x86_64\u0027",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "created folder \u0027/Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/x86_64\u0027",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "executing cmake /Users/ashutoshsamal/Library/Android/sdk/cmake/3.22.1/bin/cmake \\\n  -H/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp \\\n  -DCMAKE_SYSTEM_NAME\u003dAndroid \\\n  -DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON \\\n  -DCMAKE_SYSTEM_VERSION\u003d28 \\\n  -DANDROID_PLATFORM\u003dandroid-28 \\\n  -DANDROID_ABI\u003dx86_64 \\\n  -DCMAKE_ANDROID_ARCH_ABI\u003dx86_64 \\\n  -DANDROID_NDK\u003d/Users/ashutoshsamal/Library/Android/sdk/ndk/30.0.15729638 \\\n  -DCMAKE_ANDROID_NDK\u003d/Users/ashutoshsamal/Library/Android/sdk/ndk/30.0.15729638 \\\n  -DCMAKE_TOOLCHAIN_FILE\u003d/Users/ashutoshsamal/Library/Android/sdk/ndk/30.0.15729638/build/cmake/android.toolchain.cmake \\\n  -DCMAKE_MAKE_PROGRAM\u003d/Users/ashutoshsamal/Library/Android/sdk/cmake/3.22.1/bin/ninja \\\n  -DCMAKE_CXX_FLAGS\u003d-std\u003dc++20 \\\n  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003d/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/x86_64 \\\n  -DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003d/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/x86_64 \\\n  -DCMAKE_BUILD_TYPE\u003dDebug \\\n  -DCMAKE_FIND_ROOT_PATH\u003d/Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/prefab/x86_64/prefab \\\n  -B/Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/x86_64 \\\n  -GNinja \\\n  -DANDROID_STL\u003dc++_shared\n",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "/Users/ashutoshsamal/Library/Android/sdk/cmake/3.22.1/bin/cmake \\\n  -H/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp \\\n  -DCMAKE_SYSTEM_NAME\u003dAndroid \\\n  -DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON \\\n  -DCMAKE_SYSTEM_VERSION\u003d28 \\\n  -DANDROID_PLATFORM\u003dandroid-28 \\\n  -DANDROID_ABI\u003dx86_64 \\\n  -DCMAKE_ANDROID_ARCH_ABI\u003dx86_64 \\\n  -DANDROID_NDK\u003d/Users/ashutoshsamal/Library/Android/sdk/ndk/30.0.15729638 \\\n  -DCMAKE_ANDROID_NDK\u003d/Users/ashutoshsamal/Library/Android/sdk/ndk/30.0.15729638 \\\n  -DCMAKE_TOOLCHAIN_FILE\u003d/Users/ashutoshsamal/Library/Android/sdk/ndk/30.0.15729638/build/cmake/android.toolchain.cmake \\\n  -DCMAKE_MAKE_PROGRAM\u003d/Users/ashutoshsamal/Library/Android/sdk/cmake/3.22.1/bin/ninja \\\n  -DCMAKE_CXX_FLAGS\u003d-std\u003dc++20 \\\n  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003d/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/x86_64 \\\n  -DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003d/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/x86_64 \\\n  -DCMAKE_BUILD_TYPE\u003dDebug \\\n  -DCMAKE_FIND_ROOT_PATH\u003d/Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/prefab/x86_64/prefab \\\n  -B/Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/x86_64 \\\n  -GNinja \\\n  -DANDROID_STL\u003dc++_shared\n",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "Received process result: 0",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "Exiting generation of /Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/x86_64/compile_commands.json.bin normally",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "done executing cmake",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "hard linked /Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/x86_64/compile_commands.json to /Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/tools/debug/x86_64/compile_commands.json",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  },
+  {
+    "level_": 0,
+    "message_": "JSON generation completed without problems",
+    "file_": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/CMakeLists.txt",
+    "tag_": "debug|x86_64",
+    "diagnosticCode_": 0,
+    "memoizedIsInitialized": 1,
+    "unknownFields": {
+      "fields": {}
+    },
+    "memoizedSize": -1,
+    "memoizedHashCode": 0
+  }
+]

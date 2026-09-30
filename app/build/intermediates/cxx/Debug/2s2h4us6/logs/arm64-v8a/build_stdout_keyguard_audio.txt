@@ -1,0 +1,3 @@
+ninja: Entering directory `/Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/arm64-v8a'
+[1/2] Building CXX object CMakeFiles/keyguard_audio.dir/keyguard_audio.cpp.o
+[2/2] Linking CXX shared library /Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/arm64-v8a/libkeyguard_audio.so

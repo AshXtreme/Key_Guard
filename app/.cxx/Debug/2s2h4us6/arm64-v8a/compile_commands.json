@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/arm64-v8a",
+  "command": "/Users/ashutoshsamal/Library/Android/sdk/ndk/30.0.15729638/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=aarch64-none-linux-android28 --sysroot=/Users/ashutoshsamal/Library/Android/sdk/ndk/30.0.15729638/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dkeyguard_audio_EXPORTS -isystem /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/e6663c2903d3ca874756baf547d08338/transformed/oboe-1.9.0/prefab/modules/oboe/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -fPIC -std=c++20 -o CMakeFiles/keyguard_audio.dir/keyguard_audio.cpp.o -c /Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/keyguard_audio.cpp",
+  "file": "/Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/cpp/keyguard_audio.cpp"
+}
+]

@@ -1,0 +1,4 @@
+/Users/ashutoshsamal/Library/Android/sdk/cmake/3.22.1/bin/ninja \
+  -C \
+  /Users/ashutoshsamal/Desktop/KeyGuard/app/.cxx/Debug/2s2h4us6/x86_64 \
+  keyguard_audio
