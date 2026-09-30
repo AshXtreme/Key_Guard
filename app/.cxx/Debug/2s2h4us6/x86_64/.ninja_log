@@ -1,3 +1,6 @@
 # ninja log v5
-0	324	1790780226788619845	CMakeFiles/keyguard_audio.dir/keyguard_audio.cpp.o	d4931e0c7cfbc611
 326	359	1790780226824576234	/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/x86_64/libkeyguard_audio.so	a6539ef289982ee7
+0	324	1790780226788619845	CMakeFiles/keyguard_audio.dir/keyguard_audio.cpp.o	d4931e0c7cfbc611
+0	465	1790783307991855789	CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o	4a6cfd9075f29a17
+0	470	1790783307997123887	CMakeFiles/keyguard_audio.dir/MechanicalSoundEngine.cpp.o	590baed2f4e3f1c6
+470	509	1790783308038014325	/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/x86_64/libkeyguard_audio.so	aa7016f14b0f34bc

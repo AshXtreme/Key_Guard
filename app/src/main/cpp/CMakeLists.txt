@@ -11,7 +11,8 @@ find_package(oboe REQUIRED CONFIG)
 
 # Native audio engine shared library
 add_library(keyguard_audio SHARED
-    keyguard_audio.cpp
+    MechanicalSoundEngine.cpp
+    native_audio_bridge.cpp
 )
 
 # Link oboe prefab target along with Android system libraries
