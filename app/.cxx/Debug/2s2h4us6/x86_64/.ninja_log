@@ -4,3 +4,5 @@
 0	465	1790783307991855789	CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o	4a6cfd9075f29a17
 0	470	1790783307997123887	CMakeFiles/keyguard_audio.dir/MechanicalSoundEngine.cpp.o	590baed2f4e3f1c6
 470	509	1790783308038014325	/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/x86_64/libkeyguard_audio.so	aa7016f14b0f34bc
+2	412	1790784383245450295	CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o	4a6cfd9075f29a17
+412	463	1790784383297173786	/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/x86_64/libkeyguard_audio.so	aa7016f14b0f34bc

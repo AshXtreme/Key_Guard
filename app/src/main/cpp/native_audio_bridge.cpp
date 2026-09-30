@@ -35,15 +35,7 @@ std::vector<int16_t> generateDefaultClick() {
     return buffer;
 }
 
-} // namespace
-
-extern "C" {
-
-JNIEXPORT jboolean JNICALL
-Java_com_keyguard_ime_audio_NativeAudioEngine_nativeInit(
-    JNIEnv* /*env*/,
-    jobject /*thiz*/) {
-
+jboolean initEngineInternal() {
     std::lock_guard<std::mutex> lock(gEngineMutex);
     if (!gEngine) {
         gEngine = std::make_unique<keyguard::audio::MechanicalSoundEngine>();
@@ -62,23 +54,14 @@ Java_com_keyguard_ime_audio_NativeAudioEngine_nativeInit(
     return static_cast<jboolean>(started);
 }
 
-JNIEXPORT void JNICALL
-Java_com_keyguard_ime_audio_NativeAudioEngine_nativeTriggerClick(
-    JNIEnv* /*env*/,
-    jobject /*thiz*/) {
-
+void triggerClickInternal() {
     // Fast-path: pointer dereference and lock-free atomic trigger
     if (gEngine) {
         gEngine->triggerClick();
     }
 }
 
-JNIEXPORT jboolean JNICALL
-Java_com_keyguard_ime_audio_NativeAudioEngine_nativeLoadSample(
-    JNIEnv* env,
-    jobject /*thiz*/,
-    jshortArray sampleData) {
-
+jboolean loadSampleInternal(JNIEnv* env, jshortArray sampleData) {
     if (env == nullptr || sampleData == nullptr) {
         LOGE("nativeLoadSample called with null parameters.");
         return JNI_FALSE;
@@ -107,17 +90,83 @@ Java_com_keyguard_ime_audio_NativeAudioEngine_nativeLoadSample(
     return JNI_TRUE;
 }
 
-JNIEXPORT void JNICALL
-Java_com_keyguard_ime_audio_NativeAudioEngine_nativeTeardown(
-    JNIEnv* /*env*/,
-    jobject /*thiz*/) {
-
+void teardownInternal() {
     std::lock_guard<std::mutex> lock(gEngineMutex);
     if (gEngine) {
         gEngine->teardown();
         gEngine.reset();
         LOGI("Native Audio Engine torn down and released.");
     }
+}
+
+} // namespace
+
+extern "C" {
+
+// ============================================================================
+// JNI bindings for NativeSoundBridge
+// ============================================================================
+
+JNIEXPORT jboolean JNICALL
+Java_com_keyguard_ime_audio_NativeSoundBridge_nativeInit(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/) {
+    return initEngineInternal();
+}
+
+JNIEXPORT void JNICALL
+Java_com_keyguard_ime_audio_NativeSoundBridge_nativeTriggerClick(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/) {
+    triggerClickInternal();
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_keyguard_ime_audio_NativeSoundBridge_nativeLoadSample(
+    JNIEnv* env,
+    jobject /*thiz*/,
+    jshortArray sampleData) {
+    return loadSampleInternal(env, sampleData);
+}
+
+JNIEXPORT void JNICALL
+Java_com_keyguard_ime_audio_NativeSoundBridge_nativeTeardown(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/) {
+    teardownInternal();
+}
+
+// ============================================================================
+// JNI bindings for NativeAudioEngine
+// ============================================================================
+
+JNIEXPORT jboolean JNICALL
+Java_com_keyguard_ime_audio_NativeAudioEngine_nativeInit(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/) {
+    return initEngineInternal();
+}
+
+JNIEXPORT void JNICALL
+Java_com_keyguard_ime_audio_NativeAudioEngine_nativeTriggerClick(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/) {
+    triggerClickInternal();
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_keyguard_ime_audio_NativeAudioEngine_nativeLoadSample(
+    JNIEnv* env,
+    jobject /*thiz*/,
+    jshortArray sampleData) {
+    return loadSampleInternal(env, sampleData);
+}
+
+JNIEXPORT void JNICALL
+Java_com_keyguard_ime_audio_NativeAudioEngine_nativeTeardown(
+    JNIEnv* /*env*/,
+    jobject /*thiz*/) {
+    teardownInternal();
 }
 
 } // extern "C"
