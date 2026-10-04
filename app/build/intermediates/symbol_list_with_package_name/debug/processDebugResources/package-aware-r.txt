@@ -166,6 +166,7 @@ layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
 string androidx_startup
+string app_name
 string call_notification_answer_action
 string call_notification_answer_video_action
 string call_notification_decline_action
@@ -178,6 +179,7 @@ string close_sheet
 string default_error_message
 string default_popup_window_title
 string dropdown_menu
+string ime_service_name
 string in_progress
 string indeterminate
 string m3c_bottom_sheet_collapse_description
@@ -246,6 +248,7 @@ string state_empty
 string state_off
 string state_on
 string status_bar_notification_info_overflow
+string subtype_en_us
 string switch_role
 string tab
 string template_percent
@@ -269,3 +272,4 @@ styleable FontFamily fontProviderAuthority fontProviderCerts fontProviderFallbac
 styleable FontFamilyFont android_font android_fontWeight android_fontStyle android_ttcIndex android_fontVariationSettings font fontStyle fontVariationSettings fontWeight ttcIndex
 styleable GradientColor android_startColor android_endColor android_type android_centerX android_centerY android_gradientRadius android_tileMode android_centerColor android_startX android_startY android_endX android_endY
 styleable GradientColorItem android_color android_offset
+xml method

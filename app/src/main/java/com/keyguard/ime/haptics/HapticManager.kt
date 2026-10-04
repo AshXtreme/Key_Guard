@@ -111,4 +111,9 @@ class HapticManager(context: Context) {
             Log.w(TAG, "Failed to perform haptic feedback for category: $category", e)
         }
     }
+
+    /**
+     * Alias for performHaptic to support playHaptic invocations.
+     */
+    fun playHaptic(category: KeyCategory) = performHaptic(category)
 }

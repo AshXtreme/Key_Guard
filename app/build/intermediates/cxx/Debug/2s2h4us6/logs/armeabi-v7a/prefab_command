@@ -15,5 +15,5 @@
   --ndk-version \
   30 \
   --output \
-  /var/folders/h9/r0rp1z694gg_hbnv_v7gn7340000gn/T/agp-prefab-staging13966045811528218537/staged-cli-output \
-  /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/e6663c2903d3ca874756baf547d08338/transformed/oboe-1.9.0/prefab
+  /var/folders/h9/r0rp1z694gg_hbnv_v7gn7340000gn/T/agp-prefab-staging12419864716592701927/staged-cli-output \
+  /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/12771f8af1778f7ba0fd6618f5f5928a/transformed/oboe-1.9.0/prefab
