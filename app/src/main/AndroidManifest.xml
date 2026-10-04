@@ -3,6 +3,7 @@
 
     <!-- Air-Gap Enforcement: NO android.permission.INTERNET -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="false"
@@ -22,6 +23,16 @@
                 android:name="android.view.im"
                 android:resource="@xml/method" />
         </service>
+
+        <!-- Translucent Permission Request Trampoline for InputMethodService -->
+        <activity
+            android:name=".permissions.PermissionTrampolineActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:windowSoftInputMode="stateUnchanged" />
 
     </application>
 

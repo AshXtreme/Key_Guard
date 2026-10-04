@@ -1,6 +1,10 @@
 package com.keyguard.ime
 
+import android.content.BroadcastReceiver
 import android.content.ComponentCallbacks2
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.inputmethodservice.InputMethodService
 import android.text.InputType
 import android.util.Log
@@ -12,9 +16,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.content.ContextCompat
 import com.keyguard.ime.audio.NativeSoundBridge
 import com.keyguard.ime.haptics.HapticManager
 import com.keyguard.ime.haptics.KeyCategory
+import com.keyguard.ime.permissions.PermissionTrampolineActivity
 import com.keyguard.ime.ui.ImeLifecycleOwner
 import com.keyguard.ime.ui.KeyboardScreen
 
@@ -28,6 +34,7 @@ import com.keyguard.ime.ui.KeyboardScreen
  *  3. Jetpack Compose UI hosted via ImeLifecycleOwner.
  *  4. Strict anti-keylogger password field detection.
  *  5. Proactive LMK (Low Memory Killer) cache eviction.
+ *  6. Transparent PermissionTrampolineActivity for runtime RECORD_AUDIO requests.
  */
 class KeyGuardService : InputMethodService() {
 
@@ -41,8 +48,21 @@ class KeyGuardService : InputMethodService() {
     // Anti-Keylogger / Secure Field invariant state
     private var isSecureTargetState by mutableStateOf(false)
 
+    // Microphone / Speech-to-text permission state
+    private var isAudioPermissionGranted by mutableStateOf(false)
+
     // Volatile transient prediction/input buffer
     private val transientInputBuffer = StringBuilder()
+
+    private val permissionReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == PermissionTrampolineActivity.ACTION_RECORD_AUDIO_RESULT) {
+                val granted = intent.getBooleanExtra(PermissionTrampolineActivity.EXTRA_IS_GRANTED, false)
+                Log.i(TAG, "KeyGuardService received RECORD_AUDIO permission status: $granted")
+                isAudioPermissionGranted = granted
+            }
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -53,6 +73,15 @@ class KeyGuardService : InputMethodService() {
 
         // Pre-initialize native Oboe audio engine
         NativeSoundBridge.ensureInitialized()
+
+        // Register permission outcome receiver
+        val filter = IntentFilter(PermissionTrampolineActivity.ACTION_RECORD_AUDIO_RESULT)
+        ContextCompat.registerReceiver(
+            this,
+            permissionReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override fun onCreateInputView(): View {
@@ -75,6 +104,9 @@ class KeyGuardService : InputMethodService() {
                         },
                         onKeyUp = { key, category ->
                             handleKeyCommit(key, category)
+                        },
+                        onDictationClick = {
+                            requestAudioPermission()
                         }
                     )
                 }
@@ -201,8 +233,25 @@ class KeyGuardService : InputMethodService() {
         }
     }
 
+    /**
+     * Solves InputMethodService permission catch-22:
+     * Dispatches runtime RECORD_AUDIO permission request through transparent Activity trampoline.
+     */
+    fun requestAudioPermission() {
+        if (isSecureTargetState) {
+            Log.w(TAG, "Speech-to-text dictation blocked: Input field is marked as secure password/PIN.")
+            return
+        }
+        PermissionTrampolineActivity.launch(this)
+    }
+
     override fun onDestroy() {
-        Log.i(TAG, "KeyGuardService onDestroy: Cleaning up audio and lifecycle.")
+        Log.i(TAG, "KeyGuardService onDestroy: Cleaning up audio, permissions, and lifecycle.")
+        try {
+            unregisterReceiver(permissionReceiver)
+        } catch (e: Exception) {
+            Log.w(TAG, "Permission receiver was not registered or already unregistered", e)
+        }
         wipeTransientBuffers()
         NativeSoundBridge.teardown()
         imeLifecycleOwner.onDestroy()
