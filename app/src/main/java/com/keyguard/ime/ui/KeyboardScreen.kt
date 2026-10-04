@@ -65,7 +65,8 @@ fun KeyboardScreen(
     activeSwitchProfile: String = "Cherry MX Blue",
     onSwitchProfileClick: () -> Unit = {},
     onVaultClick: () -> Unit = {},
-    onDictationClick: () -> Unit = {}
+    onDictationClick: () -> Unit = {},
+    isDictating: Boolean = false
 ) {
     var isShiftActive by remember { mutableStateOf(false) }
     var isSymbolsMode by remember { mutableStateOf(false) }
@@ -82,6 +83,7 @@ fun KeyboardScreen(
         // =========================================================================
         TopCommandBar(
             isSecureTarget = isSecureTarget,
+            isDictating = isDictating,
             activeSwitchProfile = activeSwitchProfile,
             vaultItemCount = clipboardItems.size,
             onSwitchProfileClick = onSwitchProfileClick,
@@ -378,6 +380,7 @@ fun SecurityStatusRibbon(isSecureTarget: Boolean) {
 @Composable
 fun TopCommandBar(
     isSecureTarget: Boolean,
+    isDictating: Boolean,
     activeSwitchProfile: String,
     vaultItemCount: Int,
     onSwitchProfileClick: () -> Unit,
@@ -458,23 +461,46 @@ fun TopCommandBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            // Voice Dictation
+            // Voice Dictation (with Invariant 3: Hard-locked in secure password mode)
+            val dictationBg = when {
+                isSecureTarget -> Color(0x22334155)
+                isDictating -> Color(0xFF0C4A6E)
+                else -> Color(0xFF1E293B)
+            }
+            val dictationBorder = when {
+                isSecureTarget -> Color(0x44EF4444)
+                isDictating -> Color(0xFF38BDF8)
+                else -> Color(0xFF334155)
+            }
+            val dictationDesc = when {
+                isSecureTarget -> "Microphone hard-disabled in sensitive password field"
+                isDictating -> "Voice dictation active and listening locally"
+                else -> "Local neural voice dictation"
+            }
+
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
-                    .background(Color(0xFF1E293B))
-                    .clickable(onClick = onDictationClick)
+                    .background(dictationBg)
+                    .border(1.dp, dictationBorder, RoundedCornerShape(4.dp))
+                    .clickable(enabled = !isSecureTarget, onClick = onDictationClick)
                     .padding(horizontal = 6.dp, vertical = 3.dp)
-                    .semantics { contentDescription = "Local neural voice dictation" }
+                    .semantics { contentDescription = dictationDesc }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    Text(text = "🎤", fontSize = 10.sp)
-                    Box(modifier = Modifier.width(2.dp).height(8.dp).background(Color(0xFF38BDF8), CircleShape))
-                    Box(modifier = Modifier.width(2.dp).height(12.dp).background(Color(0xFF38BDF8), CircleShape))
-                    Box(modifier = Modifier.width(2.dp).height(6.dp).background(Color(0xFF38BDF8), CircleShape))
+                    Text(
+                        text = if (isSecureTarget) "🔒" else "🎤",
+                        fontSize = 10.sp
+                    )
+                    if (!isSecureTarget) {
+                        val barColor = if (isDictating) Color(0xFF38BDF8) else Color(0xFF64748B)
+                        Box(modifier = Modifier.width(2.dp).height(if (isDictating) 10.dp else 8.dp).background(barColor, CircleShape))
+                        Box(modifier = Modifier.width(2.dp).height(if (isDictating) 14.dp else 12.dp).background(barColor, CircleShape))
+                        Box(modifier = Modifier.width(2.dp).height(if (isDictating) 8.dp else 6.dp).background(barColor, CircleShape))
+                    }
                 }
             }
 

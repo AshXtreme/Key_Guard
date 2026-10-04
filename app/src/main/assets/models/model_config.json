@@ -1,0 +1,12 @@
+{
+  "model_type": "streaming_zipformer",
+  "quantization": "INT8",
+  "sample_rate": 16000,
+  "encoder": "encoder.int8.onnx",
+  "decoder": "decoder.onnx",
+  "joiner": "joiner.int8.onnx",
+  "tokens": "tokens.txt",
+  "num_threads": 2,
+  "provider": "cpu",
+  "description": "Quantized Zipformer INT8 offline streaming model for KeyGuard air-gapped speech recognition"
+}
