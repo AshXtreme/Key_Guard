@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -84,6 +85,13 @@ dependencies {
 
     // Oboe Audio Engine via Prefab
     implementation(libs.oboe)
+
+    // Room Database & SQLCipher
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.sqlite)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.sqlcipher)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

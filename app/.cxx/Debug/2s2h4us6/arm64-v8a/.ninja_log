@@ -1,8 +1,8 @@
 # ninja log v5
-706	867	1790873395276467795	/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/arm64-v8a/libkeyguard_audio.so	b8c2704a43d3de45
-0	718	1790780224346389990	CMakeFiles/keyguard_audio.dir/keyguard_audio.cpp.o	dfe7f9a7e439919e
-3	691	1790873395098637040	CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o	79717e371aaf22ba
-3	706	1790873395107902956	CMakeFiles/keyguard_audio.dir/MechanicalSoundEngine.cpp.o	5eddd63d08ad5857
-4	741	1791121735589450443	CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o	7f998e168c43c3be
 2	747	1791121735598529478	CMakeFiles/keyguard_audio.dir/MechanicalSoundEngine.cpp.o	3ea9aa3a3a56817
+4	741	1791121735589450443	CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o	7f998e168c43c3be
+0	718	1790780224346389990	CMakeFiles/keyguard_audio.dir/keyguard_audio.cpp.o	dfe7f9a7e439919e
 747	917	1791121735774061542	/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/arm64-v8a/libkeyguard_audio.so	b041f6e5e1db520b
+2	683	1791122599719587457	CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o	27a70af93365705b
+2	691	1791122599729531706	CMakeFiles/keyguard_audio.dir/MechanicalSoundEngine.cpp.o	b3e259bb5e160c54
+691	827	1791122599867669434	/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/arm64-v8a/libkeyguard_audio.so	b30e6d47b3aa494
