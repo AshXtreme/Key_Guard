@@ -1,13 +1,79 @@
-*.iml
-.gradle
-/local.properties
-/.idea
-.DS_Store
-build/
-/build
-/captures
-.externalNativeBuild
-.cxx
+# =========================================================================
+# KeyGuard (Cybersecure Multilingual Android IME) - Hardened .gitignore
+# =========================================================================
+
+# Built application packages & bundles
 *.apk
+*.ap_
 *.aab
+
+# Gradle & Build cache
+.gradle/
+build/
+*/build/
+out/
+.kotlin/
+
+# Local configuration & environment secrets
+local.properties
+secrets.properties
+gradle-app.setting
+.bundle/
+
+# Android Studio / IntelliJ IDEA
+*.iml
+.idea/
+*.iws
+*.ipr
+.shelf/
+
+# VS Code
 .vscode/
+
+# Native CMake & Android NDK Artifacts
+.cxx/
+.externalNativeBuild/
+cmake-build-*/
+compile_commands.json
+*.so
+*.o
+*.a
+
+# Large Neural Network Weights & On-Device ML Binaries (PRD §5.2)
+# Exclude heavy weights while keeping directory structure and descriptor configs
+*.onnx
+*.onnx_data
+*.pt
+*.bin
+*.tflite
+*.weights
+!app/src/main/assets/models/.gitkeep
+!app/src/main/assets/models/tokens.txt
+!app/src/main/assets/models/model_config.json
+
+# Keystores, Signing Keys & Auth Credentials
+*.jks
+*.keystore
+google-services.json
+*.pem
+*.key
+*.p12
+
+# Database & SQLite Transient Artifacts
+schemas/
+*.db
+*.db-shm
+*.db-wal
+
+# Profiling, Tracing & Crash Logs
+captures/
+*.hprof
+*.log
+
+# Operating System Metadata
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Gradle Wrapper (ensure jar is preserved)
+!gradle/wrapper/gradle-wrapper.jar
