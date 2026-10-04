@@ -53,7 +53,7 @@ build CMakeFiles/keyguard_audio.dir/MechanicalSoundEngine.cpp.o: CXX_COMPILER__k
   DEFINES = -Dkeyguard_audio_EXPORTS
   DEP_FILE = CMakeFiles/keyguard_audio.dir/MechanicalSoundEngine.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -fPIC -std=c++20
-  INCLUDES = -isystem /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/12771f8af1778f7ba0fd6618f5f5928a/transformed/oboe-1.9.0/prefab/modules/oboe/include
+  INCLUDES = -isystem /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/d4db63bccbf04223538a65d5dabd4a3b/transformed/oboe-1.9.0/prefab/modules/oboe/include
   OBJECT_DIR = CMakeFiles/keyguard_audio.dir
   OBJECT_FILE_DIR = CMakeFiles/keyguard_audio.dir
 
@@ -61,7 +61,7 @@ build CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o: CXX_COMPILER__key
   DEFINES = -Dkeyguard_audio_EXPORTS
   DEP_FILE = CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -fPIC -std=c++20
-  INCLUDES = -isystem /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/12771f8af1778f7ba0fd6618f5f5928a/transformed/oboe-1.9.0/prefab/modules/oboe/include
+  INCLUDES = -isystem /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/d4db63bccbf04223538a65d5dabd4a3b/transformed/oboe-1.9.0/prefab/modules/oboe/include
   OBJECT_DIR = CMakeFiles/keyguard_audio.dir
   OBJECT_FILE_DIR = CMakeFiles/keyguard_audio.dir
 
@@ -73,10 +73,10 @@ build CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o: CXX_COMPILER__key
 #############################################
 # Link the shared library /Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/armeabi-v7a/libkeyguard_audio.so
 
-build /Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/armeabi-v7a/libkeyguard_audio.so: CXX_SHARED_LIBRARY_LINKER__keyguard_audio_Debug CMakeFiles/keyguard_audio.dir/MechanicalSoundEngine.cpp.o CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o | /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/12771f8af1778f7ba0fd6618f5f5928a/transformed/oboe-1.9.0/prefab/modules/oboe/libs/android.armeabi-v7a/liboboe.so
+build /Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/armeabi-v7a/libkeyguard_audio.so: CXX_SHARED_LIBRARY_LINKER__keyguard_audio_Debug CMakeFiles/keyguard_audio.dir/MechanicalSoundEngine.cpp.o CMakeFiles/keyguard_audio.dir/native_audio_bridge.cpp.o | /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/d4db63bccbf04223538a65d5dabd4a3b/transformed/oboe-1.9.0/prefab/modules/oboe/libs/android.armeabi-v7a/liboboe.so
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info
   LINK_FLAGS = -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments
-  LINK_LIBRARIES = /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/12771f8af1778f7ba0fd6618f5f5928a/transformed/oboe-1.9.0/prefab/modules/oboe/libs/android.armeabi-v7a/liboboe.so  -landroid  -llog  -latomic -lm
+  LINK_LIBRARIES = /Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/d4db63bccbf04223538a65d5dabd4a3b/transformed/oboe-1.9.0/prefab/modules/oboe/libs/android.armeabi-v7a/liboboe.so  -landroid  -llog  -latomic -lm
   OBJECT_DIR = CMakeFiles/keyguard_audio.dir
   POST_BUILD = :
   PRE_LINK = :

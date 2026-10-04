@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.keyguard.ime.clipboard.EphemeralClipboardBufferTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-04T13:45:59" hostname="Mac.lan" time="0.027">
+  <properties/>
+  <testcase name="testPasswordExclusionAndParameterSanitization" classname="com.keyguard.ime.clipboard.EphemeralClipboardBufferTest" time="0.013"/>
+  <testcase name="testArrayZeroizationOnTtlExpiration" classname="com.keyguard.ime.clipboard.EphemeralClipboardBufferTest" time="0.007"/>
+  <testcase name="testArrayZeroizationOnCapacityEviction" classname="com.keyguard.ime.clipboard.EphemeralClipboardBufferTest" time="0.003"/>
+  <testcase name="testClearAllZeroizesAllEntries" classname="com.keyguard.ime.clipboard.EphemeralClipboardBufferTest" time="0.0"/>
+  <testcase name="testContentTypeClassification" classname="com.keyguard.ime.clipboard.EphemeralClipboardBufferTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

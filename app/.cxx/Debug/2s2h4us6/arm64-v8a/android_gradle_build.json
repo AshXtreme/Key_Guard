@@ -23,7 +23,7 @@
       "artifactName": "keyguard_audio",
       "output": "/Users/ashutoshsamal/Desktop/KeyGuard/app/build/intermediates/cxx/Debug/2s2h4us6/obj/arm64-v8a/libkeyguard_audio.so",
       "runtimeFiles": [
-        "/Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/12771f8af1778f7ba0fd6618f5f5928a/transformed/oboe-1.9.0/prefab/modules/oboe/libs/android.arm64-v8a/liboboe.so"
+        "/Users/ashutoshsamal/.gradle/caches/8.10.2/transforms/d4db63bccbf04223538a65d5dabd4a3b/transformed/oboe-1.9.0/prefab/modules/oboe/libs/android.arm64-v8a/liboboe.so"
       ]
     }
   },

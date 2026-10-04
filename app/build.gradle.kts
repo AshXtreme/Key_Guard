@@ -85,5 +85,8 @@ dependencies {
     // Oboe Audio Engine via Prefab
     implementation(libs.oboe)
 
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
