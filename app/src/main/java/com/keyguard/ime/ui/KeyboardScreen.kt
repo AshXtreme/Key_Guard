@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -32,22 +33,39 @@ import androidx.compose.ui.unit.sp
 import com.keyguard.ime.haptics.KeyCategory
 import com.keyguard.ime.ui.components.KeyCap
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.keyguard.ime.ui.clipboard.ClipboardRibbon
+import com.keyguard.ime.ui.clipboard.ClipboardRibbonItem
+import com.keyguard.ime.ui.clipboard.RibbonTheme
+
 /**
  * KeyboardScreen
  *
  * Primary responsive IME view adhering to WCAG 2.1 AA accessibility and zero-latency audio guidelines.
- * Features:
- *  1. Dynamic QWERTY and Numeric/Symbol layouts.
- *  2. High-contrast theme (#0F172A) with distinct functional key elevation.
- *  3. Visual Security Banner (#7F1D1D) displayed when inputting into sensitive password/PIN targets.
- *  4. Instant pointer-down audio & haptic triggering.
+ * Architecture:
+ *  [Zone 1]: Top Security & Utility Command Bar (Air-gap status, Switch profile, Dictation, Vault)
+ *  [Zone 2]: Dynamic Context Ribbon (Smart Vault carousel or Security Lockout banner)
+ *  [Zone 3]: Primary Key Matrix (QWERTY / Numeric / Symbols with WCAG 48dp touch targets)
  */
 @Composable
 fun KeyboardScreen(
     isSecureTarget: Boolean,
     onKeyDown: (KeyCategory) -> Unit,
     onKeyUp: (String, KeyCategory) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    clipboardItems: List<ClipboardRibbonItem> = emptyList(),
+    ribbonTheme: RibbonTheme = RibbonTheme.INDUSTRIAL_MATTE,
+    onClipboardPaste: (ClipboardRibbonItem) -> Unit = {},
+    onClipboardPinToggle: (ClipboardRibbonItem) -> Unit = {},
+    onClipboardDelete: (ClipboardRibbonItem) -> Unit = {},
+    activeSwitchProfile: String = "Cherry MX Blue",
+    onSwitchProfileClick: () -> Unit = {},
+    onVaultClick: () -> Unit = {},
+    onDictationClick: () -> Unit = {}
 ) {
     var isShiftActive by remember { mutableStateOf(false) }
     var isSymbolsMode by remember { mutableStateOf(false) }
@@ -59,9 +77,33 @@ fun KeyboardScreen(
             .padding(horizontal = 4.dp, vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        // Visual Security Banner & Status Header
-        SecurityStatusRibbon(isSecureTarget = isSecureTarget)
+        // =========================================================================
+        // [ZONE 1] TOP SECURITY & UTILITY COMMAND BAR
+        // =========================================================================
+        TopCommandBar(
+            isSecureTarget = isSecureTarget,
+            activeSwitchProfile = activeSwitchProfile,
+            vaultItemCount = clipboardItems.size,
+            onSwitchProfileClick = onSwitchProfileClick,
+            onDictationClick = onDictationClick,
+            onVaultClick = onVaultClick
+        )
 
+        // =========================================================================
+        // [ZONE 2] DYNAMIC CONTEXT RIBBON (Expandable 36dp)
+        // =========================================================================
+        ClipboardRibbon(
+            items = clipboardItems,
+            isSecureTarget = isSecureTarget,
+            theme = ribbonTheme,
+            onPaste = onClipboardPaste,
+            onPinToggle = onClipboardPinToggle,
+            onDelete = onClipboardDelete
+        )
+
+        // =========================================================================
+        // [ZONE 3] PRIMARY KEY MATRIX (48dp height minimum touch targets)
+        // =========================================================================
         if (!isSymbolsMode) {
             // ==========================================
             // QWERTY Alphabetic Layout
@@ -325,3 +367,219 @@ fun SecurityStatusRibbon(isSecureTarget: Boolean) {
         }
     }
 }
+
+/**
+ * TopCommandBar
+ *
+ * Zone 1 Top Command Bar matching the Stitch UI design specification:
+ *  - Left: Air-Gapped Shield Status Badge (ZERO-NET) & Mechanical Switch Profile Selector
+ *  - Right: Dictation indicator, Clipboard Vault counter badge, Gated Translate DLP lock
+ */
+@Composable
+fun TopCommandBar(
+    isSecureTarget: Boolean,
+    activeSwitchProfile: String,
+    vaultItemCount: Int,
+    onSwitchProfileClick: () -> Unit,
+    onDictationClick: () -> Unit,
+    onVaultClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(38.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .background(Color(0xFF0B0F19))
+            .border(1.dp, Color(0xFF1E293B), RoundedCornerShape(6.dp))
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Left: Air-gap status badge & switch selector
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            // ZERO-NET Air-gap badge
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0x2610B981))
+                    .border(1.dp, Color(0x4D10B981), RoundedCornerShape(4.dp))
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                    .semantics { contentDescription = "Air-gapped secure mode, zero network passthrough" }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .background(Color(0xFF10B981), CircleShape)
+                )
+                Text(
+                    text = "ZERO-NET",
+                    color = Color(0xFF34D399),
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+
+            // Mechanical switch profile chip
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0xFF1E293B))
+                    .border(1.dp, Color(0xFF334155), RoundedCornerShape(4.dp))
+                    .clickable(onClick = onSwitchProfileClick)
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                    .semantics { contentDescription = "Switch profile: $activeSwitchProfile. Tap to change." }
+            ) {
+                Text(
+                    text = "⚙",
+                    color = Color(0xFF38BDF8),
+                    fontSize = 9.sp
+                )
+                Text(
+                    text = activeSwitchProfile,
+                    color = Color(0xFFE2E8F0),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+        }
+
+        // Right: Dictation, Vault counter, and Gated Translate
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            // Voice Dictation
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0xFF1E293B))
+                    .clickable(onClick = onDictationClick)
+                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                    .semantics { contentDescription = "Local neural voice dictation" }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(text = "🎤", fontSize = 10.sp)
+                    Box(modifier = Modifier.width(2.dp).height(8.dp).background(Color(0xFF38BDF8), CircleShape))
+                    Box(modifier = Modifier.width(2.dp).height(12.dp).background(Color(0xFF38BDF8), CircleShape))
+                    Box(modifier = Modifier.width(2.dp).height(6.dp).background(Color(0xFF38BDF8), CircleShape))
+                }
+            }
+
+            // Clipboard Vault badge
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0xFF1E293B))
+                    .clickable(onClick = onVaultClick)
+                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                    .semantics { contentDescription = "Encrypted clipboard vault with $vaultItemCount items" }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                ) {
+                    Text(text = "📋", fontSize = 10.sp)
+                    if (vaultItemCount > 0) {
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(Color(0xFF0284C7))
+                                .padding(horizontal = 4.dp, vertical = 1.dp)
+                        ) {
+                            Text(
+                                text = vaultItemCount.toString(),
+                                color = Color.White,
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Gated Translate with Padlock
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(Color(0xFF1E293B))
+                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                    .semantics { contentDescription = "Hardware-isolated DLP translation sandbox" }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(text = "🌐", fontSize = 10.sp)
+                    Text(text = "🔒", fontSize = 8.sp)
+                }
+            }
+        }
+    }
+}
+
+// =============================================================================
+// COMPOSE PREVIEWS
+// =============================================================================
+
+@androidx.compose.ui.tooling.preview.Preview(name = "Keyboard Screen - Full Cyber Interface", showBackground = true)
+@Composable
+private fun KeyboardScreenFullPreview() {
+    val sampleItems = listOf(
+        ClipboardRibbonItem(
+            id = "1",
+            previewText = "git commit -m 'fix oboe latency'",
+            classifiedType = com.keyguard.ime.clipboard.util.ClassifiedContentType.CODE_SNIPPET,
+            isPinned = true
+        ),
+        ClipboardRibbonItem(
+            id = "2",
+            previewText = "john.doe@enterprise.io",
+            classifiedType = com.keyguard.ime.clipboard.util.ClassifiedContentType.EMAIL,
+            isPinned = false
+        ),
+        ClipboardRibbonItem(
+            id = "3",
+            previewText = "https://keyguard.dev/spec",
+            classifiedType = com.keyguard.ime.clipboard.util.ClassifiedContentType.URL,
+            isPinned = false
+        )
+    )
+
+    KeyboardScreen(
+        isSecureTarget = false,
+        onKeyDown = {},
+        onKeyUp = { _, _ -> },
+        clipboardItems = sampleItems,
+        ribbonTheme = RibbonTheme.INDUSTRIAL_MATTE,
+        activeSwitchProfile = "Cherry MX Blue"
+    )
+}
+
+@androidx.compose.ui.tooling.preview.Preview(name = "Keyboard Screen - Secure Lockout", showBackground = true)
+@Composable
+private fun KeyboardScreenLockoutPreview() {
+    KeyboardScreen(
+        isSecureTarget = true,
+        onKeyDown = {},
+        onKeyUp = { _, _ -> },
+        clipboardItems = emptyList(),
+        ribbonTheme = RibbonTheme.INDUSTRIAL_MATTE,
+        activeSwitchProfile = "Cherry MX Blue"
+    )
+}
+
+

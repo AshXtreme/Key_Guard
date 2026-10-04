@@ -1,5 +1,7 @@
 package com.keyguard.ime.clipboard.model
 
+import com.keyguard.ime.clipboard.util.ClassifiedContentType
+import com.keyguard.ime.clipboard.util.ContentClassifier
 import java.util.Arrays
 import java.util.UUID
 
@@ -13,7 +15,18 @@ enum class ContentType {
     PLAIN_TEXT,
     CODE,
     URL,
-    EMAIL
+    EMAIL,
+    PHONE_NUMBER;
+
+    companion object {
+        fun fromClassified(classified: ClassifiedContentType): ContentType = when (classified) {
+            ClassifiedContentType.CODE_SNIPPET -> CODE
+            ClassifiedContentType.EMAIL -> EMAIL
+            ClassifiedContentType.URL -> URL
+            ClassifiedContentType.PHONE_NUMBER -> PHONE_NUMBER
+            ClassifiedContentType.PLAIN_TEXT -> PLAIN_TEXT
+        }
+    }
 }
 
 /**
@@ -74,38 +87,12 @@ class ClipboardItem(
     }
 
     companion object {
-        private val URL_PATTERN = Regex("^(https?|ftp)://[^\\s/$.?#].[^\\s]*$", RegexOption.IGNORE_CASE)
-        private val EMAIL_PATTERN = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
-
-        private val CODE_SYNTAX_PATTERNS = listOf(
-            Regex("(public|private|protected|class|fun|function|def|val|var|const|import|package|interface|struct|enum)\\s+[A-Za-z0-9_]+"),
-            Regex("(#include|#define|console\\.log|println|print\\(|return\\s+)"),
-            Regex("[\\{\\};=><\\[\\]]{2,}"),
-            Regex("<\\/?[a-zA-Z][a-zA-Z0-9]*(\\s+[^>]*)?>")
-        )
-
         /**
-         * Analyzes characters to determine semantic ContentType.
+         * Analyzes characters to determine semantic ContentType via ContentClassifier.
          */
         fun classify(chars: CharArray): ContentType {
-            if (chars.isEmpty()) return ContentType.PLAIN_TEXT
-            val text = String(chars).trim()
-
-            if (URL_PATTERN.matches(text)) {
-                return ContentType.URL
-            }
-
-            if (EMAIL_PATTERN.matches(text)) {
-                return ContentType.EMAIL
-            }
-
-            for (pattern in CODE_SYNTAX_PATTERNS) {
-                if (pattern.containsMatchIn(text)) {
-                    return ContentType.CODE
-                }
-            }
-
-            return ContentType.PLAIN_TEXT
+            val classified = ContentClassifier.classify(chars)
+            return ContentType.fromClassified(classified)
         }
     }
 }
