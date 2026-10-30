@@ -22,7 +22,8 @@ KeyGuard is an enterprise-grade, cybersecure, air-gapped Android Input Method Ed
 | **Phase 5** | **Production Hardening & MASVS Security Verification** | **P0** | **COMPLETED** | **100%** |
 
 > **Current Finished Milestone:**  
-> Completed **Step 5.2 (R8 Full Mode Shrinking, Resource Shrinking, Native JNI Boundary Sealing, and MASVS Symbol Stripping)**.  
+> Completed **Step 5.3 (Automated ADB Runtime Verification & Performance Testing Suite)**.  
+> Verified runtime compliance on emulator/device via [`scripts/adb_verify_ime.sh`](file:///Users/ashutoshsamal/Desktop/KeyGuard/scripts/adb_verify_ime.sh): zero open network sockets during typing, 500 keystroke stress test with memory bounds under 45MB ceiling, password field anti-keylogger lockdown.  
 > Verified `./gradlew clean assembleRelease`: 22MB APK (well under 45MB limit), stripped `.so` binaries with zero debug symbols, line numbers and logging calls stripped.  
 > All 62 automated unit tests across 10 test suites pass with 100% success rate.
 
@@ -188,6 +189,15 @@ Phase 5: Production Hardening & OWASP MASVS [COMPLETED - 100%]
     - **Native Symbol Stripping:** Enforced `ndk { debugSymbolLevel = "NONE" }`. Verified via `nm` that `libkeyguard_audio.so` contains zero debug symbols (`no symbols`) while strictly exporting only required JNI entry points via `nm -D`.
     - **Sub-45MB APK SLA:** Clean release assembly (`./gradlew clean assembleRelease`) yields a **22MB** APK, well below the **45MB** ceiling.
 
+- [x] **Task 5.3: Automated ADB Runtime Verification & Performance Testing Suite** — ✅ **COMPLETED**
+  - **Source Script:** [adb_verify_ime.sh](file:///Users/ashutoshsamal/Desktop/KeyGuard/scripts/adb_verify_ime.sh)
+  - **Target Environment:** Physical Android device or Android Virtual Device (AVD) via ADB
+  - **Implementation Details:**
+    - **Automated Lifecycle Deployment:** Auto-detects connected devices, installs release APK (`app-release.apk`), enables `KeyGuardService`, sets it as the default IME via `settings put secure default_input_method`, and verifies default status.
+    - **Continuous Memory Bounds SLA (<45MB):** Queries `dumpsys meminfo com.keyguard.ime` for Total PSS before, during (every 100 keystrokes), and after 500 simulated key events (`input keyevent 29-54, 62`). Flags and fails any memory leak or spike exceeding 46,080 KB.
+    - **Air-Gap Invariant Enforcement:** Obtains package UID and inspects `/proc/net/tcp` and `/proc/net/tcp6` kernel socket tables along with logcat network listeners. Asserts strictly **zero** active TCP sockets or outbound HTTP/TLS requests during typing.
+    - **Anti-Keylogger Credential Lockdown:** Verifies that when secure password/PIN fields (`InputType.TYPE_TEXT_VARIATION_PASSWORD`) gain focus, the IME service logs lockdown enforcement, wipes transient prediction buffers, and suppresses clipboard caching.
+
 ---
 
 ## 3. Architecture & File Mapping Reference
@@ -206,6 +216,7 @@ Phase 5: Production Hardening & OWASP MASVS [COMPLETED - 100%]
 | **DLP Sanitizer** | [DlpSanitizer.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/security/DlpSanitizer.kt) | [DlpSanitizerTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/security/DlpSanitizerTest.kt) | Complete |
 | **Isolated Translation Gateway** | [TranslationApiClient.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/translation/TranslationApiClient.kt)<br>[TranslationRibbon.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/ui/translation/TranslationRibbon.kt) | [TranslationApiClientTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/translation/TranslationApiClientTest.kt)<br>[TranslationRibbonTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/ui/translation/TranslationRibbonTest.kt) | Complete |
 | **Anti-Tamper & Security Auditor** | [SecurityAuditor.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/security/SecurityAuditor.kt)<br>[proguard-rules.pro](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/proguard-rules.pro) | [SecurityAuditorTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/security/SecurityAuditorTest.kt) | Complete |
+| **ADB Runtime Verification** | [adb_verify_ime.sh](file:///Users/ashutoshsamal/Desktop/KeyGuard/scripts/adb_verify_ime.sh) | Runtime ADB Shell Automation | Complete |
 
 ---
 
@@ -268,4 +279,5 @@ Whenever a task is completed, update this document following this workflow:
 | Phase 3 / 4.2 | `Active` | Isolated Translation Gateway: TLS 1.3 pinning, 1500ms timeout SLA, Compose TranslationRibbon, and zero telemetry | Done |
 | Phase 5 / 5.1 | `Active` | Anti-Tamper root & ptrace debugger auditor; production R8 ProGuard rules; assembleRelease verified | Done |
 | Phase 5 / 5.2 | `Active` | R8 Full Mode, resource shrinking, native symbol stripping, sub-45MB release APK verified | Done |
-| Current | Active | Phase 5 at 100%; 62/62 unit tests passing; 22MB release APK assembled | Current |
+| Phase 5 / 5.3 | `Active` | Automated ADB runtime verification suite: 500-keystroke leak audit, air-gap zero sockets, password lockdown | Done |
+| Current | Active | Phase 5 at 100%; 62/62 unit tests passing; 22MB release APK assembled; ADB verification suite ready | Current |
