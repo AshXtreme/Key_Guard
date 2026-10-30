@@ -29,6 +29,11 @@ import com.keyguard.ime.stt.SpeechRecognitionListener
 import com.keyguard.ime.stt.VoiceCommand
 import com.keyguard.ime.ui.ImeLifecycleOwner
 import com.keyguard.ime.ui.KeyboardScreen
+import com.keyguard.ime.translation.TranslationApiClient
+import com.keyguard.ime.translation.TranslationResult
+import com.keyguard.ime.ui.translation.DEFAULT_TARGET_LANGUAGES
+import com.keyguard.ime.ui.translation.TargetLanguage
+import com.keyguard.ime.ui.translation.TranslationRibbonState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -68,6 +73,12 @@ class KeyGuardService : InputMethodService() {
     // Microphone / Speech-to-text permission & dictation state
     private var isAudioPermissionGranted by mutableStateOf(false)
     private var isDictatingState by mutableStateOf(false)
+
+    // Isolated Translation Gateway State
+    private var isTranslationVisibleState by mutableStateOf(false)
+    private var translationRibbonState by mutableStateOf<TranslationRibbonState>(TranslationRibbonState.Idle)
+    private var selectedTargetLanguageState by mutableStateOf(DEFAULT_TARGET_LANGUAGES[0])
+    private val translationClient by lazy { TranslationApiClient.create() }
 
     // Volatile transient prediction/input buffer
     private val transientInputBuffer = StringBuilder()
@@ -150,6 +161,9 @@ class KeyGuardService : InputMethodService() {
                     KeyboardScreen(
                         isSecureTarget = isSecureTargetState,
                         isDictating = isDictatingState,
+                        isTranslationVisible = isTranslationVisibleState,
+                        translationState = translationRibbonState,
+                        selectedTargetLanguage = selectedTargetLanguageState,
                         onKeyDown = { category ->
                             // INVARIANT 3: Fire audio and haptic feedback immediately on touch-down
                             NativeSoundBridge.triggerClick()
@@ -160,6 +174,24 @@ class KeyGuardService : InputMethodService() {
                         },
                         onDictationClick = {
                             toggleDictation()
+                        },
+                        onToggleTranslationRibbon = {
+                            isTranslationVisibleState = !isTranslationVisibleState
+                            if (!isTranslationVisibleState) {
+                                translationRibbonState = TranslationRibbonState.Idle
+                            }
+                        },
+                        onLanguageSelected = { lang ->
+                            selectedTargetLanguageState = lang
+                        },
+                        onTranslateTrigger = {
+                            executeExplicitTranslation()
+                        },
+                        onApplyTranslation = { translatedText ->
+                            applyTranslatedText(translatedText)
+                        },
+                        onDismissTranslationError = {
+                            translationRibbonState = TranslationRibbonState.Idle
                         }
                     )
                 }
@@ -220,6 +252,8 @@ class KeyGuardService : InputMethodService() {
         if (isSecure) {
             Log.i(TAG, "Secure target input field detected (InputType=0x${Integer.toHexString(inputType)}). Enforcing air-gap lockdown.")
             stopDictation()
+            isTranslationVisibleState = false
+            translationRibbonState = TranslationRibbonState.Idle
             wipeTransientBuffers()
         }
     }
@@ -403,11 +437,93 @@ class KeyGuardService : InputMethodService() {
         ) {
             Log.w(TAG, "High memory pressure: Tearing down audio stream, STT session, and wiping transient caches.")
             stopDictation()
+            isTranslationVisibleState = false
+            translationRibbonState = TranslationRibbonState.Idle
             speechEngine.release()
             wipeTransientBuffers()
             NativeSoundBridge.teardown()
             System.gc()
         }
+    }
+
+    /**
+     * Executes explicit user-triggered outbound translation (Phase 4 / Task 3.2).
+     * Invariants:
+     *  - Outbound calls trigger strictly on explicit user button tap. Never during typing.
+     *  - Hard-locked in secure password fields.
+     *  - Client-side pre-flight DLP blocks sensitive data before socket creation.
+     */
+    private fun executeExplicitTranslation() {
+        if (isSecureTargetState) {
+            Log.w(TAG, "Translation blocked: Secure password target.")
+            return
+        }
+
+        val ic = currentInputConnection ?: return
+        val selectedText = ic.getSelectedText(0)?.toString()
+        val textToTranslate = if (!selectedText.isNullOrBlank()) {
+            selectedText
+        } else {
+            ic.getTextBeforeCursor(500, 0)?.toString() ?: ""
+        }
+
+        if (textToTranslate.isBlank()) {
+            Log.i(TAG, "Translation skipped: Input buffer is blank.")
+            return
+        }
+
+        translationRibbonState = TranslationRibbonState.Loading
+
+        serviceScope.launch(Dispatchers.Main) {
+            val result = translationClient.translate(
+                text = textToTranslate,
+                targetLang = selectedTargetLanguageState.code
+            )
+
+            translationRibbonState = when (result) {
+                is TranslationResult.Success -> {
+                    TranslationRibbonState.Success(
+                        originalText = textToTranslate,
+                        translatedText = result.translatedText,
+                        targetLang = result.targetLang
+                    )
+                }
+                is TranslationResult.DlpBlocked -> {
+                    Log.w(TAG, "Outbound translation intercepted by local DLP: ${result.reason}")
+                    TranslationRibbonState.DlpError(
+                        reason = result.reason,
+                        violationType = result.violationType
+                    )
+                }
+                is TranslationResult.NetworkError -> {
+                    Log.e(TAG, "Translation network failure: ${result.message}")
+                    TranslationRibbonState.NetworkError(
+                        message = result.message,
+                        isTimeout = result.isTimeout
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Commits translated string to currentInputConnection and replaces selection if present.
+     */
+    private fun applyTranslatedText(translatedText: String) {
+        if (translatedText.isEmpty() || isSecureTargetState) return
+        val ic = currentInputConnection ?: return
+
+        val selectedText = ic.getSelectedText(0)
+        if (selectedText != null && selectedText.isNotEmpty()) {
+            ic.commitText(translatedText, 1)
+        } else {
+            val before = ic.getTextBeforeCursor(1, 0)
+            val needsSpace = before != null && before.isNotEmpty() && before[0] != ' ' && before[0] != '\n'
+            val formattedText = if (needsSpace) " $translatedText" else translatedText
+            ic.commitText(formattedText, 1)
+        }
+
+        translationRibbonState = TranslationRibbonState.Idle
     }
 
     /**

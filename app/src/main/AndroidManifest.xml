@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Air-Gap Enforcement: NO android.permission.INTERNET -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!--
+        Strictly Scoped Egress: Outbound translation requests only (Explicit User Intent).
+        Air-Gapped Typing Core Invariant:
+         - Network sockets must NEVER open automatically during typing.
+         - Outbound calls trigger strictly on explicit user button tap in TranslationRibbon.
+         - Cleartext HTTP is forbidden; strictly enforces TLS 1.3 and SHA-256 certificate pinning.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="false"

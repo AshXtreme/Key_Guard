@@ -36,11 +36,17 @@ import com.keyguard.ime.ui.components.KeyCap
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import com.keyguard.ime.ui.clipboard.ClipboardRibbon
 import com.keyguard.ime.ui.clipboard.ClipboardRibbonItem
 import com.keyguard.ime.ui.clipboard.RibbonTheme
+import com.keyguard.ime.ui.translation.DEFAULT_TARGET_LANGUAGES
+import com.keyguard.ime.ui.translation.TargetLanguage
+import com.keyguard.ime.ui.translation.TranslationRibbon
+import com.keyguard.ime.ui.translation.TranslationRibbonState
 
 /**
  * KeyboardScreen
@@ -66,7 +72,15 @@ fun KeyboardScreen(
     onSwitchProfileClick: () -> Unit = {},
     onVaultClick: () -> Unit = {},
     onDictationClick: () -> Unit = {},
-    isDictating: Boolean = false
+    isDictating: Boolean = false,
+    isTranslationVisible: Boolean = false,
+    translationState: TranslationRibbonState = TranslationRibbonState.Idle,
+    selectedTargetLanguage: TargetLanguage = DEFAULT_TARGET_LANGUAGES[0],
+    onLanguageSelected: (TargetLanguage) -> Unit = {},
+    onTranslateTrigger: () -> Unit = {},
+    onApplyTranslation: (String) -> Unit = {},
+    onDismissTranslationError: () -> Unit = {},
+    onToggleTranslationRibbon: () -> Unit = {}
 ) {
     var isShiftActive by remember { mutableStateOf(false) }
     var isSymbolsMode by remember { mutableStateOf(false) }
@@ -86,22 +100,38 @@ fun KeyboardScreen(
             isDictating = isDictating,
             activeSwitchProfile = activeSwitchProfile,
             vaultItemCount = clipboardItems.size,
+            isTranslationActive = isTranslationVisible,
             onSwitchProfileClick = onSwitchProfileClick,
             onDictationClick = onDictationClick,
-            onVaultClick = onVaultClick
+            onVaultClick = onVaultClick,
+            onTranslateClick = onToggleTranslationRibbon
         )
 
         // =========================================================================
         // [ZONE 2] DYNAMIC CONTEXT RIBBON (Expandable 36dp)
+        // Switchable between ClipboardRibbon and TranslationRibbon
         // =========================================================================
-        ClipboardRibbon(
-            items = clipboardItems,
-            isSecureTarget = isSecureTarget,
-            theme = ribbonTheme,
-            onPaste = onClipboardPaste,
-            onPinToggle = onClipboardPinToggle,
-            onDelete = onClipboardDelete
-        )
+        if (isTranslationVisible) {
+            TranslationRibbon(
+                isSecureTarget = isSecureTarget,
+                ribbonState = translationState,
+                selectedTargetLanguage = selectedTargetLanguage,
+                onLanguageSelected = onLanguageSelected,
+                onTranslateTrigger = onTranslateTrigger,
+                onApplyTranslation = onApplyTranslation,
+                onDismissError = onDismissTranslationError,
+                onCloseRibbon = onToggleTranslationRibbon
+            )
+        } else {
+            ClipboardRibbon(
+                items = clipboardItems,
+                isSecureTarget = isSecureTarget,
+                theme = ribbonTheme,
+                onPaste = onClipboardPaste,
+                onPinToggle = onClipboardPinToggle,
+                onDelete = onClipboardDelete
+            )
+        }
 
         // =========================================================================
         // [ZONE 3] PRIMARY KEY MATRIX (48dp height minimum touch targets)
@@ -386,6 +416,8 @@ fun TopCommandBar(
     onSwitchProfileClick: () -> Unit,
     onDictationClick: () -> Unit,
     onVaultClick: () -> Unit,
+    onTranslateClick: () -> Unit = {},
+    isTranslationActive: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -537,13 +569,21 @@ fun TopCommandBar(
                 }
             }
 
-            // Gated Translate with Padlock
+            // Gated Translate with Padlock (Toggles isolated Translation Ribbon)
+            val translateBg = if (isTranslationActive) Color(0xFF1E3A8A) else Color(0xFF1E293B)
+            val translateBorder = if (isTranslationActive) Color(0xFF38BDF8) else Color(0xFF334155)
+
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(4.dp))
-                    .background(Color(0xFF1E293B))
+                    .background(translateBg)
+                    .border(1.dp, translateBorder, RoundedCornerShape(4.dp))
+                    .clickable(onClick = onTranslateClick)
                     .padding(horizontal = 6.dp, vertical = 3.dp)
-                    .semantics { contentDescription = "Hardware-isolated DLP translation sandbox" }
+                    .semantics {
+                        role = Role.Button
+                        contentDescription = "Gated DLP translation gateway. Tap to open translation ribbon."
+                    }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

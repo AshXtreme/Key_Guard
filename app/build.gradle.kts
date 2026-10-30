@@ -93,8 +93,15 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.sqlcipher)
 
+    // Networking & Isolated Translation Gateway
+    implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.gson)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.okhttp.mockwebserver)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
