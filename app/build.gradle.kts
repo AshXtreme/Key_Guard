@@ -34,11 +34,12 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -60,6 +61,12 @@ android {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")
             version = "3.22.1"
+        }
+    }
+
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
         }
     }
 

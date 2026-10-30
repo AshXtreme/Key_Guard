@@ -29,6 +29,7 @@ import com.keyguard.ime.stt.SpeechRecognitionListener
 import com.keyguard.ime.stt.VoiceCommand
 import com.keyguard.ime.ui.ImeLifecycleOwner
 import com.keyguard.ime.ui.KeyboardScreen
+import com.keyguard.ime.security.SecurityAuditor
 import com.keyguard.ime.translation.TranslationApiClient
 import com.keyguard.ime.translation.TranslationResult
 import com.keyguard.ime.ui.translation.DEFAULT_TARGET_LANGUAGES
@@ -99,6 +100,15 @@ class KeyGuardService : InputMethodService() {
     override fun onCreate() {
         super.onCreate()
         Log.i(TAG, "KeyGuardService onCreate: Initializing lifecycle, audio, haptics, and STT engine.")
+
+        // OWASP MASVS Anti-Tamper & Anti-Debug Environment Audit
+        val auditReport = SecurityAuditor.performAudit(this)
+        if (auditReport.isEnvironmentCompromised) {
+            Log.w(
+                TAG,
+                "KeyGuard environment compromise detected: Rooted=${auditReport.isRooted}, DebuggerAttached=${auditReport.isDebuggerAttached}"
+            )
+        }
 
         imeLifecycleOwner.onCreate()
         hapticManager = HapticManager(this)

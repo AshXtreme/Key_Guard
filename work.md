@@ -19,10 +19,12 @@ KeyGuard is an enterprise-grade, cybersecure, air-gapped Android Input Method Ed
 | **Phase 2** | **Local Processing & Core Security Features** | **P1** | **COMPLETED** | **100%** |
 | **Phase 3** | **Data Loss Prevention & Isolated Egress Gateway** | **P2** | **IN PROGRESS** | **67%** |
 | **Phase 4** | **Infrastructure, Multi-Platform & Telemetry** | **P3** | **PLANNED** | **0%** |
+| **Phase 5** | **Production Hardening & MASVS Security Verification** | **P0** | **IN PROGRESS** | **50%** |
 
 > **Current Finished Milestone:**  
-> We have fully finished **Phase 1 (P0)** and **Phase 2 (P1)**, and have completed **Task 3.1 (Client-Side DLP Sanitizer)** and **Task 3.2 / Phase 4 Step 4.2 (Gated Outbound Translation Gateway)** of **Phase 3 (P2)**.  
-> All 51 automated unit tests across 9 test suites pass with 100% success rate.
+> Completed **Step 5.1 (Production ProGuard/R8 Obfuscation & SecurityAuditor Anti-Tamper Engine)**.  
+> Verified `./gradlew assembleRelease` minification with R8 and JNI entry point preservation.  
+> All 62 automated unit tests across 10 test suites pass with 100% success rate.
 
 ---
 
@@ -49,6 +51,10 @@ Phase 4: P3 Deployment & Multi-Platform [PLANNED - 0%]
   ├── Task 4.1: Kubernetes Microservices & Envoy Token Bucket Gateway
   ├── Task 4.2: Automated MASVS Security Penetration Suite
   └── Task 4.3: iOS Sandboxed Extension Target (UIInputViewController)
+
+Phase 5: Production Hardening & OWASP MASVS [IN PROGRESS - 50%]
+  ├── Task 5.1: ProGuard / R8 Obfuscation & SecurityAuditor Anti-Tamper [COMPLETED]
+  └── Task 5.2: MASVS Verification & Runtime Tamper Telemetry [PLANNED]
 ```
 
 ---
@@ -163,6 +169,19 @@ Phase 4: P3 Deployment & Multi-Platform [PLANNED - 0%]
 
 ---
 
+### Phase 5: Production Hardening & OWASP MASVS (P0) — 🟡 IN PROGRESS (50%)
+
+- [x] **Task 5.1: ProGuard / R8 DEX Obfuscation & SecurityAuditor Anti-Tamper** — ✅ **COMPLETED**
+  - **Source Files:** [SecurityAuditor.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/security/SecurityAuditor.kt), [proguard-rules.pro](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/proguard-rules.pro), [app/build.gradle.kts](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/build.gradle.kts)
+  - **Test File:** [SecurityAuditorTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/security/SecurityAuditorTest.kt) (11 tests passing)
+  - **Implementation Details:**
+    - **Anti-Tamper & Root Detection:** Lightweight, non-crashing detection inspecting common `su` binary paths, Magisk/KernelSU/APatch directories, custom ROM `test-keys` build tags, and root manager package names.
+    - **Anti-Debug / Ptrace Detection:** Direct inspection of Linux kernel `/proc/self/status` TracerPid, Android framework `Debug.isDebuggerConnected()`, and `FLAG_DEBUGGABLE` manifest verification.
+    - **Strict R8 DEX Obfuscation:** 5-pass optimization (`-optimizationpasses 5`), class flattening (`-repackageclasses ''`), dead-code stripping, log call removal (`Log.v`, `Log.d`, `Log.i`), and aggressive renaming of internal cryptographic and security classes.
+    - **JNI Preservation:** Explicitly preserved all native JNI entry points for `libkeyguard_audio.so` (`NativeSoundBridge` and `NativeAudioEngine`), verified via `seeds.txt` and `./gradlew assembleRelease`.
+
+---
+
 ## 3. Architecture & File Mapping Reference
 
 | Architectural Domain | Key Implementation Files | Test Files | Status |
@@ -178,24 +197,25 @@ Phase 4: P3 Deployment & Multi-Platform [PLANNED - 0%]
 | **Permission Trampoline** | [PermissionTrampolineActivity.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/permissions/PermissionTrampolineActivity.kt) | [PermissionTrampolineActivityTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/permissions/PermissionTrampolineActivityTest.kt) | Complete |
 | **DLP Sanitizer** | [DlpSanitizer.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/security/DlpSanitizer.kt) | [DlpSanitizerTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/security/DlpSanitizerTest.kt) | Complete |
 | **Isolated Translation Gateway** | [TranslationApiClient.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/translation/TranslationApiClient.kt)<br>[TranslationRibbon.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/ui/translation/TranslationRibbon.kt) | [TranslationApiClientTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/translation/TranslationApiClientTest.kt)<br>[TranslationRibbonTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/ui/translation/TranslationRibbonTest.kt) | Complete |
+| **Anti-Tamper & Security Auditor** | [SecurityAuditor.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/security/SecurityAuditor.kt)<br>[proguard-rules.pro](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/proguard-rules.pro) | [SecurityAuditorTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/security/SecurityAuditorTest.kt) | Complete |
 
 ---
 
 ## 4. Test Verification & Quality Gates
 
-The test suite validates cryptographic derivation, memory sanitization, clipboard ring buffering, voice commands, DLP pattern blocking, TLS 1.3 certificate pinning, and zero-telemetry egress.
+The test suite validates cryptographic derivation, memory sanitization, clipboard ring buffering, voice commands, DLP pattern blocking, TLS 1.3 certificate pinning, zero-telemetry egress, and anti-tamper runtime auditing.
 
 ```
 --------------------------------------------------------------------------------
 TEST EXECUTION SUMMARY
 --------------------------------------------------------------------------------
-Total Test Suites Run:       9
-Total Tests Executed:         51
-Tests Passed:                 51
+Total Test Suites Run:       10
+Total Tests Executed:         62
+Tests Passed:                 62
 Failures:                     0
 Ignored:                      0
 Success Rate:                 100%
-Execution Duration:           ~2.73s
+Execution Duration:           ~2.85s
 --------------------------------------------------------------------------------
 Suite Breakdown:
   - EphemeralClipboardBufferTest:        5 passed (5/5)
@@ -207,6 +227,7 @@ Suite Breakdown:
   - DlpSanitizerTest:                   13 passed (13/13)
   - TranslationApiClientTest:           11 passed (11/11)
   - TranslationRibbonTest:               3 passed (3/3)
+  - SecurityAuditorTest:                11 passed (11/11)
 --------------------------------------------------------------------------------
 ```
 
@@ -237,4 +258,5 @@ Whenever a task is completed, update this document following this workflow:
 | Phase 2 | `1a8a998` | 16kHz audio capture, Sherpa-ONNX streaming STT, and voice commands | Done |
 | Phase 3 | `76e0f9a` | Client-Side DLP Sanitizer with Luhn checksum and credential blocking | Done |
 | Phase 3 / 4.2 | `Active` | Isolated Translation Gateway: TLS 1.3 pinning, 1500ms timeout SLA, Compose TranslationRibbon, and zero telemetry | Done |
-| Current | Active | Validated 51/51 unit tests across 9 test suites; Phase 3 at 67% | Current |
+| Phase 5 / 5.1 | `Active` | Anti-Tamper root & ptrace debugger auditor; production R8 ProGuard rules; assembleRelease verified | Done |
+| Current | Active | Validated 62/62 unit tests across 10 test suites; assembleRelease build verified | Current |
