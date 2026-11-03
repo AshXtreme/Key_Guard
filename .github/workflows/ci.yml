@@ -1,0 +1,113 @@
+name: KeyGuard CI - Verification & Quality Gates
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # 1. Static Security & Secret Scanning Audit
+  # ============================================================================
+  security-audit:
+    name: Secret Scanning & Static Code Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          config-path: .gitleaks.toml
+          fail-on-leak: true
+
+  # ============================================================================
+  # 2. Build, Native NDK Compilation & Test Execution
+  # ============================================================================
+  build-and-test:
+    name: Native Build & Test Suite (NDK 26.1 / JDK 17)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [security-audit]
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle Wrapper Integrity
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "gradle"
+
+      - name: Cache Android NDK & CMake
+        uses: actions/cache@v4
+        id: cache-android-ndk
+        with:
+          path: |
+            ${{ env.ANDROID_HOME }}/ndk/26.1.10909125
+            ${{ env.ANDROID_HOME }}/cmake/3.22.1
+          key: android-ndk-26.1.10909125-cmake-3.22.1-${{ runner.os }}
+
+      - name: Set up Android NDK (r26b - 26.1.10909125)
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26b
+          link-to-sdk: true
+
+      - name: Set up CMake 3.22.1 via Sdkmanager
+        run: |
+          echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "cmake;3.22.1"
+
+      - name: Make Gradle Executable
+        run: chmod +x ./gradlew
+
+      - name: Run Android Lint (Static Analysis)
+        run: ./gradlew lintDebug --stacktrace
+
+      - name: Upload Lint Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.html
+          if-no-files-found: ignore
+
+      - name: Run Unit Test Suite (62 tests / 10 suites)
+        run: ./gradlew test --stacktrace
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: app/build/reports/tests/testReleaseUnitTest/
+          if-no-files-found: ignore
+
+      - name: Assemble Debug APK (Native Oboe & JNI Linking)
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+

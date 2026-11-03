@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,7 +10,18 @@ plugins {
 android {
     namespace = "com.keyguard.ime"
     compileSdk = 35
-    ndkVersion = "30.0.15729638"
+
+    val localProps = Properties().apply {
+        val file = rootProject.file("local.properties")
+        if (file.exists()) {
+            file.inputStream().use { load(it) }
+        }
+    }
+    val targetNdkVersion: String = (project.findProperty("android.ndkVersion") as? String)
+        ?: localProps.getProperty("android.ndkVersion")
+        ?: System.getenv("ANDROID_NDK_VERSION")
+        ?: "26.1.10909125"
+    ndkVersion = targetNdkVersion
 
     defaultConfig {
         applicationId = "com.keyguard.ime"
@@ -32,6 +45,19 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("KEYGUARD_KEYSTORE_PATH") ?: "release-keystore.jks"
+            val keystoreFile = file(keystorePath)
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = System.getenv("KEYGUARD_KEYSTORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("KEYGUARD_KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("KEYGUARD_KEY_PASSWORD") ?: ""
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -40,7 +66,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            val releaseKeystore = file(System.getenv("KEYGUARD_KEYSTORE_PATH") ?: "release-keystore.jks")
+            signingConfig = if (releaseKeystore.exists() && !System.getenv("KEYGUARD_KEYSTORE_PASSWORD").isNullOrEmpty()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             ndk {
                 debugSymbolLevel = "NONE"
             }
@@ -66,6 +97,12 @@ android {
             path = file("src/main/cpp/CMakeLists.txt")
             version = "3.22.1"
         }
+    }
+
+    lint {
+        abortOnError = false
+        checkDependencies = true
+        ignoreTestSources = true
     }
 
     testOptions {

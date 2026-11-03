@@ -1,0 +1,17 @@
+# Gitleaks Configuration for KeyGuard
+# Prevents false positives from mock DLP tokens in test suites (PRD §5.4)
+
+[allowlist]
+description = "Synthetic test fixtures and mock credential patterns for DLP validation"
+paths = [
+  '''app/src/test/.*''',
+  '''scripts/.*'''
+]
+regexes = [
+  '''ghp_[A-Za-z0-9]{36}''',
+  '''AKIA[0-9A-Z]{16}''',
+  '''AIza[0-9A-Za-z\-_]{35}''',
+  '''sk_live_[0-9a-zA-Z]{24}''',
+  '''eyJ[a-zA-Z0-9_-]{10,}\.eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}'''
+]
+

@@ -1,0 +1,141 @@
+name: KeyGuard Release - Production Packaging & MASVS Hardening
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release-build:
+    name: Build, Sign & Publish Production Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout Tagged Release
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle Wrapper Integrity
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "gradle"
+
+      - name: Cache Android NDK & CMake
+        uses: actions/cache@v4
+        id: cache-android-ndk
+        with:
+          path: |
+            ${{ env.ANDROID_HOME }}/ndk/26.1.10909125
+            ${{ env.ANDROID_HOME }}/cmake/3.22.1
+          key: android-ndk-26.1.10909125-cmake-3.22.1-${{ runner.os }}
+
+      - name: Set up Android NDK (r26b - 26.1.10909125)
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26b
+          link-to-sdk: true
+
+      - name: Set up CMake 3.22.1 via Sdkmanager
+        run: |
+          echo "y" | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --install "cmake;3.22.1"
+
+      - name: Make Gradle Executable
+        run: chmod +x ./gradlew
+
+      # ------------------------------------------------------------------------
+      # Secret Leak Prevention: Decode base64 keystore into isolated file
+      # ------------------------------------------------------------------------
+      - name: Decode Base64 Release Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYGUARD_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::Secret KEYGUARD_KEYSTORE_BASE64 is empty or not configured."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > app/release-keystore.jks
+          chmod 600 app/release-keystore.jks
+          echo "Release keystore decoded successfully."
+
+      # ------------------------------------------------------------------------
+      # Build Minified, Hardened Release APK (R8 Full Mode & Resource Shrinking)
+      # ------------------------------------------------------------------------
+      - name: Build Minified Release APK
+        env:
+          KEYGUARD_KEYSTORE_PATH: "release-keystore.jks"
+          KEYGUARD_KEYSTORE_PASSWORD: ${{ secrets.KEYGUARD_KEYSTORE_PASSWORD }}
+          KEYGUARD_KEY_ALIAS: ${{ secrets.KEYGUARD_KEY_ALIAS }}
+          KEYGUARD_KEY_PASSWORD: ${{ secrets.KEYGUARD_KEY_PASSWORD }}
+        run: |
+          ./gradlew clean assembleRelease --stacktrace
+
+      # ------------------------------------------------------------------------
+      # Zero-Residual Keystore Cleanup: NIST SP 800-88 File Sanitization
+      # ------------------------------------------------------------------------
+      - name: Securely Shred Release Keystore
+        if: always()
+        run: |
+          if [ -f app/release-keystore.jks ]; then
+            shred -u -z -n 3 app/release-keystore.jks 2>/dev/null || rm -f app/release-keystore.jks
+            echo "Release keystore shredded and removed from runner disk."
+          fi
+
+      # ------------------------------------------------------------------------
+      # Verification: ProGuard/R8 Mapping Existence & Sub-45MB APK SLA
+      # ------------------------------------------------------------------------
+      - name: Verify R8 Mapping File & Sub-45MB APK Ceiling
+        run: |
+          MAPPING_FILE="app/build/outputs/mapping/release/mapping.txt"
+          if [ ! -s "$MAPPING_FILE" ]; then
+            echo "::error::R8 mapping file $MAPPING_FILE is missing or empty!"
+            exit 1
+          fi
+          echo "R8 mapping file verified ($(wc -l < "$MAPPING_FILE") lines)."
+
+          APK_FILE="app/build/outputs/apk/release/app-release.apk"
+          if [ ! -f "$APK_FILE" ]; then
+            echo "::error::Release APK $APK_FILE was not generated!"
+            exit 1
+          fi
+
+          # Obtain APK size in bytes
+          APK_SIZE_BYTES=$(stat -c%s "$APK_FILE" 2>/dev/null || stat -f%z "$APK_FILE")
+          APK_SIZE_MB=$(( APK_SIZE_BYTES / 1048576 ))
+          echo "Release APK Size: ${APK_SIZE_MB}MB (${APK_SIZE_BYTES} bytes)"
+
+          # 45MB Ceiling = 47,185,920 bytes
+          if [ "$APK_SIZE_BYTES" -gt 47185920 ]; then
+            echo "::error::Release APK (${APK_SIZE_MB}MB) exceeds 45MB MASVS ceiling!"
+            exit 1
+          fi
+          echo "Sub-45MB APK ceiling verified."
+
+      # ------------------------------------------------------------------------
+      # Artifact Checksums & Packaging
+      # ------------------------------------------------------------------------
+      - name: Generate SHA-256 Checksums
+        run: |
+          cd app/build/outputs/apk/release/
+          sha256sum app-release.apk > app-release.apk.sha256
+          cat app-release.apk.sha256
+
+      - name: Publish GitHub Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          name: KeyGuard Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/apk/release/app-release.apk.sha256
+            app/build/outputs/mapping/release/mapping.txt
+

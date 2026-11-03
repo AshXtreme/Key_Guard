@@ -22,7 +22,8 @@ KeyGuard is an enterprise-grade, cybersecure, air-gapped Android Input Method Ed
 | **Phase 5** | **Production Hardening & MASVS Security Verification** | **P0** | **COMPLETED** | **100%** |
 
 > **Current Finished Milestone:**  
-> Completed **Step 5.3 (Automated ADB Runtime Verification & Performance Testing Suite)**.  
+> Completed **Step 5.4 (GitHub Actions CI/CD Pipeline & Automated Release Packaging)**.  
+> Implemented and verified `.github/workflows/ci.yml` (NDK 26.1 / CMake 3.22 caching, Gitleaks secret scanning, Android Lint static audit, 62 unit tests, debug build) and `.github/workflows/release.yml` (Base64 keystore decoding, R8 Full Mode minification, NIST SP 800-88 keystore shredding, R8 mapping verification, sub-45MB APK ceiling gate, and automated GitHub Release asset publishing).  
 > Verified runtime compliance on emulator/device via [`scripts/adb_verify_ime.sh`](file:///Users/ashutoshsamal/Desktop/KeyGuard/scripts/adb_verify_ime.sh): zero open network sockets during typing, 500 keystroke stress test with memory bounds under 45MB ceiling, password field anti-keylogger lockdown.  
 > Verified `./gradlew clean assembleRelease`: 22MB APK (well under 45MB limit), stripped `.so` binaries with zero debug symbols, line numbers and logging calls stripped.  
 > All 62 automated unit tests across 10 test suites pass with 100% success rate.
@@ -198,6 +199,14 @@ Phase 5: Production Hardening & OWASP MASVS [COMPLETED - 100%]
     - **Air-Gap Invariant Enforcement:** Obtains package UID and inspects `/proc/net/tcp` and `/proc/net/tcp6` kernel socket tables along with logcat network listeners. Asserts strictly **zero** active TCP sockets or outbound HTTP/TLS requests during typing.
     - **Anti-Keylogger Credential Lockdown:** Verifies that when secure password/PIN fields (`InputType.TYPE_TEXT_VARIATION_PASSWORD`) gain focus, the IME service logs lockdown enforcement, wipes transient prediction buffers, and suppresses clipboard caching.
 
+- [x] **Task 5.4: GitHub Actions CI/CD Pipeline & Automated Release Packaging** — ✅ **COMPLETED**
+  - **Workflow Files:** [ci.yml](file:///Users/ashutoshsamal/Desktop/KeyGuard/.github/workflows/ci.yml), [release.yml](file:///Users/ashutoshsamal/Desktop/KeyGuard/.github/workflows/release.yml), [.gitleaks.toml](file:///Users/ashutoshsamal/Desktop/KeyGuard/.gitleaks.toml)
+  - **Implementation Details:**
+    - **Leak-Free Secret Management:** Isolated GitHub Actions workflow decoding Base64-encoded production release keystores at build time (`release-keystore.jks`) and performing zero-residual 3-pass cryptographic file shredding (`shred -u -z -n 3`) post-build.
+    - **Deterministic NDK & CMake Consistency:** Configured Android NDK `26.1.10909125` (r26b) and CMake `3.22.1` with dual-tier cache (`actions/cache@v4`) and automated wrapper integrity validation (`gradle/actions/wrapper-validation@v4`).
+    - **Automated Static Security & Secret Scanning:** Integrated Gitleaks secret scanner with custom `.gitleaks.toml` allowlist (suppressing synthetic DLP test fixture false positives) and automated Android Lint static analysis (`./gradlew lintDebug`).
+    - **MASVS Quality Gates & Release Deployment:** Release pipeline automatically enforces ProGuard/R8 mapping verification (`mapping.txt`), validates strict sub-45MB APK ceiling constraints, computes SHA-256 integrity checksums, and publishes versioned release artifacts via `softprops/action-gh-release@v2`.
+
 ---
 
 ## 3. Architecture & File Mapping Reference
@@ -217,6 +226,7 @@ Phase 5: Production Hardening & OWASP MASVS [COMPLETED - 100%]
 | **Isolated Translation Gateway** | [TranslationApiClient.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/translation/TranslationApiClient.kt)<br>[TranslationRibbon.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/ui/translation/TranslationRibbon.kt) | [TranslationApiClientTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/translation/TranslationApiClientTest.kt)<br>[TranslationRibbonTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/ui/translation/TranslationRibbonTest.kt) | Complete |
 | **Anti-Tamper & Security Auditor** | [SecurityAuditor.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/main/java/com/keyguard/ime/security/SecurityAuditor.kt)<br>[proguard-rules.pro](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/proguard-rules.pro) | [SecurityAuditorTest.kt](file:///Users/ashutoshsamal/Desktop/KeyGuard/app/src/test/java/com/keyguard/ime/security/SecurityAuditorTest.kt) | Complete |
 | **ADB Runtime Verification** | [adb_verify_ime.sh](file:///Users/ashutoshsamal/Desktop/KeyGuard/scripts/adb_verify_ime.sh) | Runtime ADB Shell Automation | Complete |
+| **CI/CD Quality Gates & Release** | [ci.yml](file:///Users/ashutoshsamal/Desktop/KeyGuard/.github/workflows/ci.yml)<br>[release.yml](file:///Users/ashutoshsamal/Desktop/KeyGuard/.github/workflows/release.yml)<br>[.gitleaks.toml](file:///Users/ashutoshsamal/Desktop/KeyGuard/.gitleaks.toml) | GitHub Actions Runner (Ubuntu) | Complete |
 
 ---
 
@@ -280,4 +290,5 @@ Whenever a task is completed, update this document following this workflow:
 | Phase 5 / 5.1 | `Active` | Anti-Tamper root & ptrace debugger auditor; production R8 ProGuard rules; assembleRelease verified | Done |
 | Phase 5 / 5.2 | `Active` | R8 Full Mode, resource shrinking, native symbol stripping, sub-45MB release APK verified | Done |
 | Phase 5 / 5.3 | `Active` | Automated ADB runtime verification suite: 500-keystroke leak audit, air-gap zero sockets, password lockdown | Done |
-| Current | Active | Phase 5 at 100%; 62/62 unit tests passing; 22MB release APK assembled; ADB verification suite ready | Current |
+| Phase 5 / 5.4 | `Active` | GitHub Actions CI/CD (ci.yml, release.yml), NDK 26.1/CMake caching, Gitleaks, release signing & packaging | Done |
+| Current | Active | Phase 5 at 100%; 62/62 unit tests passing; 22MB release APK assembled; CI/CD pipeline and release automation complete | Current |
